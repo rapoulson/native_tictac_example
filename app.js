@@ -1,5 +1,10 @@
 (function() {
   function appStart() {
+    if (/feed=true/.test(window.location.search)) {
+      $('#app').addClass('hidden');
+      $('#feed').removeClass('hidden');
+    }
+
     TT.api.get('v1/me').done(fetchStoreProducts, addClickHandlers).fail(genericError);
   }
 
@@ -10,8 +15,24 @@
     );
   }
 
+  function feedCardCreated() {
+    TT.native.showStatus('Created');
+  }
+
+  function addFeedCard(e) {
+    TT.api.post('v1/stores/' + e.data.store.id + '/cards', {
+      title: 'My First Native Feed Card',
+      card_type: 'native',
+      content: {
+        url: 'http://localhost:4000?feed=true'
+      }
+    }).done(feedCardCreated).fail(genericError);
+  }
+
   function addClickHandlers(store) {
     $('.share-button').on('click', share);
+    $('.feed-button').on('click', { store: store }, addFeedCard);
+    $('.perform-button').click(function() { TT.native.performCard(); });
   }
 
   function genericError() {
@@ -35,7 +56,10 @@
     }
   }
 
+
   TT.native.init()
     .done(appStart)
     .fail(genericError);
+    
+  TT.native.reportSize();
 })();
