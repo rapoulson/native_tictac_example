@@ -1,6 +1,17 @@
 (function() {
   function appStart() {
-    TT.api.get('v1/me').done(fetchStoreProducts).fail(genericError);
+    TT.api.get('v1/me').done(fetchStoreProducts, addClickHandlers).fail(genericError);
+  }
+
+  function share() {
+    TT.native.showShareDialog(
+      'You\'re awesome!',
+      'Hey, I just built my first app on Tictail!'
+    );
+  }
+
+  function addClickHandlers(store) {
+    $('.share-button').on('click', share);
   }
 
   function genericError() {
